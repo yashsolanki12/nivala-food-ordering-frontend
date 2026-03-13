@@ -17,7 +17,7 @@ const PaymentGateway = ({ orderData, setshowPaymentGateway }) => {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response.data);
+      // console.log(response.data);
       setshowPaymentGateway(false);
       navigate("/");
       toast.success("Order Placed Successfully");

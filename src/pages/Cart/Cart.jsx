@@ -20,17 +20,22 @@ const Cart = () => {
     setDiscount,
     discountApplied,
     setDiscountApplied,
+    token,
   } = useContext(StoreContext);
 
   const navigate = useNavigate();
 
   const handleApplyPromoCode = async () => {
     try {
-      const response = await axios.post(`${url}/api/promo/check`, {
-        promoCode,
-      });
+      const response = await axios.post(
+        `${url}/api/promo/check`,
+        { promoCode },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
       const promo = response.data;
-      console.log(promo);
       if (promo.success) {
         if (promo.data.discountType === "percentage") {
           setDiscountApplied(true);

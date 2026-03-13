@@ -15,27 +15,32 @@ import axios from "axios";
 const App = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showPaymentGateway, setShowPaymentGateway] = useState(false);
-  const [orderData,setOrderData] = useState({})
-  const {url} =useContext(StoreContext)
+  const [orderData, setOrderData] = useState({});
+  const { url } = useContext(StoreContext);
+
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(`${url}`);
-        console.log(res);
+        const res = await axios.get(`${url}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        // console.log(res);
         toast.success(res.data.message);
-        clearInterval(intervalId); 
+        clearInterval(intervalId);
       } catch (error) {
         console.error("Error connecting to server");
-        toast("Backend Server Take a while to Wake up, Please Wait!" , {icon: "⏳"} );
+        toast("Backend Server Take a while to Wake up, Please Wait!", {
+          icon: "⏳",
+        });
       }
     };
 
-    const intervalId = setInterval(fetchData, 30000); 
+    const intervalId = setInterval(fetchData, 30000);
 
     fetchData();
 
-   
     return () => clearInterval(intervalId);
   }, []);
 
@@ -43,15 +48,30 @@ const App = () => {
     <>
       <Toaster position="top-right" reverseOrder={false} />
       {showLogin ? <LoginPopup setShowLogin={setShowLogin} /> : <></>}
-      {showPaymentGateway ? <PaymentGateway orderData={orderData} setShowPaymentGateway={setShowPaymentGateway}/>  : <></>}
+      {showPaymentGateway ? (
+        <PaymentGateway
+          orderData={orderData}
+          setShowPaymentGateway={setShowPaymentGateway}
+        />
+      ) : (
+        <></>
+      )}
       <div className="app">
         <Navbar setShowLogin={setShowLogin} />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/cart" element={<Cart />} />
-          <Route path="/placeorder" element={<PlaceOrder setShowPaymentGateway={setShowPaymentGateway} setOrderData={setOrderData} setShowLogin={setShowLogin}/>} />
-          <Route path='/myorders' element={<MyOrders />} />
-
+          <Route
+            path="/placeorder"
+            element={
+              <PlaceOrder
+                setShowPaymentGateway={setShowPaymentGateway}
+                setOrderData={setOrderData}
+                setShowLogin={setShowLogin}
+              />
+            }
+          />
+          <Route path="/myorders" element={<MyOrders />} />
         </Routes>
       </div>
       <Footer />

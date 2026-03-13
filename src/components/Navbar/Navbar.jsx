@@ -10,15 +10,15 @@ import { IoLogOut } from "react-icons/io5";
 
 const Navbar = ({ setShowLogin }) => {
   const [menu, setMenu] = useState("home");
-  const { getTotalItemsCount, token,setToken } = useContext(StoreContext);
-
+  const { getTotalItemsCount, token, setToken } = useContext(StoreContext);
+  // const token = localStorage.getItem()
   const navigate = useNavigate();
 
   const logout = () => {
     localStorage.removeItem("token");
     setToken("");
     navigate("/");
-  }
+  };
 
   return (
     <div className="navbar">
@@ -70,12 +70,17 @@ const Navbar = ({ setShowLogin }) => {
           <div className="navbar-profile">
             <CgProfile fontSize="2em" />
             <ul className="nav-profile-dropdown">
-              <li onClick={()=>navigate("/myorders")}><FaShoppingCart fontSize="1.5em" /><p>Orders</p></li>
-              <hr/>
-              <li onClick={logout}><IoLogOut fontSize="1.5em"/><p>Logout</p></li>
+              <li onClick={() => navigate("/myorders")}>
+                <FaShoppingCart fontSize="1.5em" />
+                <p>Orders</p>
+              </li>
+              <hr />
+              <li onClick={logout}>
+                <IoLogOut fontSize="1.5em" />
+                <p>Logout</p>
+              </li>
             </ul>
           </div>
-          
         )}
       </div>
     </div>

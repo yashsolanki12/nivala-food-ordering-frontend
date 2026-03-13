@@ -4,14 +4,17 @@ import "./Coupon.css";
 import axios from "axios";
 
 const Coupon = () => {
-  const { url } = useContext(StoreContext);
+  const { url, token } = useContext(StoreContext);
   const [promos, setPromos] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchPromos = async () => {
-      try {
-        const response = await axios.get(`${url}/api/promo/all`);
+  console.log("token 2", token);
+  const fetchPromos = async () => {
+    try {
+      if (token) {
+        const response = await axios.get(`${url}/api/promo/all`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         if (response.data.success) {
           // Filter only active promos
           const activePromos = response.data.data.filter(
@@ -19,14 +22,18 @@ const Coupon = () => {
           );
           setPromos(activePromos);
         }
-      } catch (error) {
-        console.error("Error fetching promos:", error);
-      } finally {
-        setLoading(false);
       }
-    };
-    fetchPromos();
-  }, [url]);
+    } catch (error) {
+      console.error("Error fetching promos:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+    if (token) {
+      fetchPromos();
+    }
+  }, [token]);
 
   if (loading) {
     return null;

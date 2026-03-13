@@ -15,21 +15,29 @@ const StoreContextProvider = (props) => {
   const [discountApplied, setDiscountApplied] = useState(false);
 
   useEffect(() => {
-    async function loadData() {
-      await fetchFoodList();
-      const savedToken = localStorage.getItem("token");
-      if (savedToken) {
-        setToken(savedToken);
-      }
-      await loadCartData(localStorage.getItem("token"));
+    const savedToken = localStorage.getItem("token");
+    if (savedToken) {
+      setToken(savedToken);
     }
-    loadData();
   }, []);
 
   const fetchFoodList = async () => {
-    const response = await axios.get(url + "/api/food/list");
-    setFoodList(response.data.food);
+    const response = await axios.get(url + "/api/food/list", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setFoodList(response.data.data);
   };
+
+  useEffect(() => {
+    if (token) {
+      async function loadData() {
+        await fetchFoodList();
+
+        await loadCartData();
+      }
+      loadData();
+    }
+  }, [token]);
 
   const addToCart = async (itemId) => {
     if (!cartItems[itemId]) {
@@ -42,7 +50,7 @@ const StoreContextProvider = (props) => {
       await axios.post(
         `${url}/api/cart/add`,
         { itemId, userId },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
     }
   };
@@ -53,7 +61,7 @@ const StoreContextProvider = (props) => {
       await axios.post(
         `${url}/api/cart/remove`,
         { itemId },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { headers: { Authorization: `Bearer ${token}` } },
       );
     }
   };
@@ -69,14 +77,13 @@ const StoreContextProvider = (props) => {
     return totalAmount;
   };
 
-  const loadCartData = async (token) => {
+  const loadCartData = async () => {
     if (token) {
-      const response = await axios.post(
+      const response = await axios.get(
         `${url}/api/cart/get`,
-        {},
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
       setCartItems(response.data.cartData);
     }
